@@ -14,7 +14,10 @@ const screens = {
 
     },
     ReviewDetails: {
-        screen: newTx,
+        screen: newTx, navigationOptions: {
+            headerShown: false,
+        }
+
         /*   navigationOptions: {
                headerStyle: { backgroundColor: '#eee' },
            }*/

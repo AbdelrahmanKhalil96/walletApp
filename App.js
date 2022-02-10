@@ -40,9 +40,7 @@ export default function App() {
     }}>
       <View style={styles.container}>
         <Header />
-        <View style={styles.list}>
-          <Navigator />
-        </View>
+        <Navigator />
 
       </View>
     </TouchableWithoutFeedback>
@@ -54,14 +52,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-
-  list: {
-    flex: 0.4,
-    marginTop: 10,
-    marginBottom: 10,
-    padding: 6,
-    height: 300
-
   },
 });

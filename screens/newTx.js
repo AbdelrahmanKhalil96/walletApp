@@ -1,58 +1,34 @@
 import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
-import SelectDropdown from 'react-native-select-dropdown'
 import * as SQLite from 'expo-sqlite';
-import { NavigationActions } from 'react-navigation';
 
 export default function newTx({ navigation }) {
+    const wallet = navigation.getParam('wallet')
     var [selectedWallet, setSelectedWallet] = useState(1);
-    var wallet = navigation.getParam('wallet');
-    var setWallets = () => navigation.getParam('setWallets');
-
-    const db = navigation.getParam('db');
-    const pressHandler = () => {
-        navigation.goBack();
-        //navigation.push('ReviewDetails');
-
-    }
+    const [txReason, setTxReason] = useState('Food');
+    const [TxAmount, setTxAmount] = useState(0);
+    const [TxType, setTxType] = useState('-');
+    const [TxImportance, setTxImportance] = useState('Low');
     var dbFile = SQLite.openDatabase('WalletAppDb.db');
     const InsertToDb = () => {
         dbFile.transaction((tx) => {
             tx.executeSql(
-                "INSERT INTO transactions (walletId, type, txAmount, txReason, txImportance) VALUES (3, '+', 10, 'Health', 'High');",
+                "INSERT INTO transactions (walletId, type, txAmount, txReason, txImportance) VALUES ( cast(? as integer), ?,  cast(? as integer), ?, ?);"
+                , [selectedWallet, TxType, TxAmount, txReason, TxImportance], (tx, res) => {
+                    navigation.navigate('Home',
+                        { counter: res["insertId"] })
 
-                (_, error) => {
-                    console.log(error);
-                    return true;
-                }
+                }, (tx, err) => console.log(err)
+
             );
         })
-        console.log('s')
-        dbFile.transaction((tx) => {
-            tx.executeSql(
-                "select id,name,balance FROM wallets",
-                [],
-                (tx, results) => {
-                    var temp = [];
-                    for (let i = 0; i < results.rows.length; ++i) {
-                        temp.push({ text: results.rows.item(i).name, balance: results.rows.item(i).balance, key: results.rows.item(i).id });
-                    }
-                    wallet = temp
-                    console.log(wallet)
-                }
-            )
-
-            console.log('o')
-
-
-        })
-        navigation.navigate(Home,
-            { wallets: wallet })
     }
     return (
-        <View >
-            <Text>TTTTTTTTTTTT</Text>
+        <View style={styles.container}>
+            {/**Source */}
+            <Text>Transaction Source : </Text>
+
             <Picker
                 itemStyle={styles.itemStyle}
                 style={styles.pickerStyle}
@@ -71,10 +47,75 @@ export default function newTx({ navigation }) {
                         key={item.key} />
                 ))}
             </Picker>
+            {/**Amount */}
+
             <TextInput
                 keyboardType='number-pad'
                 style={styles.input}
                 placeholder='Transaction Amount'
+                onChangeText={setTxAmount}
+                value={TxAmount.toString()}
+            />
+            {/**Type */}
+
+            <Text>Transaction Type : </Text>
+            <Picker
+                itemStyle={styles.itemStyle}
+                style={styles.pickerStyle}
+                selectedValue={TxType}
+                onValueChange={(itemValue, itemIndex) => {
+                    setTxType(itemValue);
+                    console.log(TxType);
+                }
+                }
+            >
+                <Picker.Item
+                    color="#0087F0"
+                    label='Expanse'
+                    value='-'
+                />
+                <Picker.Item
+                    color="#0087F0"
+                    label='Income'
+                    value='+'
+                />
+            </Picker>
+            {/**Importance */}
+            <Text>Transaction Importance : </Text>
+            <Picker
+                itemStyle={styles.itemStyle}
+                style={styles.pickerStyle}
+                selectedValue={TxImportance}
+                onValueChange={(itemValue, itemIndex) => {
+                    setTxImportance(itemValue);
+                    console.log(TxImportance);
+                }
+                }
+            >
+                <Picker.Item
+                    color="#0087F0"
+                    label='LOW'
+                    value='Low'
+                />
+                <Picker.Item
+                    color="#0087F0"
+                    label='MODERATE'
+                    value='Moderate'
+                />
+                <Picker.Item
+                    color="#0087F0"
+                    label='HIGH'
+                    value='High'
+                />
+            </Picker>
+            {/**Reason */}
+
+            <TextInput
+                style={styles.input}
+                placeholder='Transaction Reason'
+                onChangeText={setTxReason}
+                value={txReason}
+
             />
             <Button title='Proceed' onPress={() => InsertToDb()} />
 
@@ -89,26 +130,24 @@ export default function newTx({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    viewStyle: {
+    container: {
         flex: 1,
-        alignSelf: "center",
-        flexDirection: "row",
-        width: "92%",
-        justifyContent: "space-between",
-        alignItems: "center"
+        backgroundColor: '#FFF',
+        margin: 10,
     },
+
     itemStyle: {
         fontSize: 10,
         color: "#007aff"
     },
     pickerStyle: {
-        width: "100%",
+        width: "80%",
         height: 40,
         color: "#007aff",
-        fontSize: 14,
+        fontSize: 12,
     },
     textStyle: {
-        fontSize: 14,
+        fontSize: 12,
     },
     input: {
         marginBottom: 10,

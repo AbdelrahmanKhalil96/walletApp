@@ -8,9 +8,15 @@ import { useIsFocused } from '@react-navigation/native';
 
 export default function Home({ navigation }) {
 
-    const [count, setcount] = useState(0);
-
+    var [count, setcount] = useState(0);
     const [wallet, setWallets] = useState([]);
+    useEffect(() => {
+        loadAllwallets(db)
+        console.log('counter Received Is: ' + navigation.getParam('counter'))
+    }
+        , [navigation.getParam('counter')]); // The second parameters are the variables this useEffect is listening to for changes.//JSON.stringify(navigation.getParam('wallets'))
+
+
     var [db, setDb] = useState([]);
     //=>DB
     const WalletAppDb = 'WalletAppDb.db';
@@ -91,28 +97,30 @@ export default function Home({ navigation }) {
         //navigation.push('ReviewDetails');
     }
     return (
-        <View style={styles.container}>
+        <View style={styles.list}>
 
-            <FlatList
-                contentContainerStyle={{
-                    borderColor: '#bbb',
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    alignItems: 'flex-start', // Centered horizontally
-                }}
-                numColumns={3}
-                data={wallet}
-                renderItem={({ item }) => (
-                    <WalletList item={item} loadAllwallets={loadAllwallets} />
-                )}
-            />
+            <View style={styles.container}>
 
-            <View style={styles.content}>
-                <Button onPress={() => pressHandler(wallet)} title='New Transaction' color='coral' />
+                <FlatList
+                    contentContainerStyle={{
+                        borderColor: '#bbb',
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        alignItems: 'flex-start', // Centered horizontally
+                    }}
+                    numColumns={3}
+                    data={wallet}
+                    renderItem={({ item }) => (
+                        <WalletList item={item} loadAllwallets={loadAllwallets} />
+                    )}
+                />
 
-            </View>
+                <View style={styles.content}>
+                    <Button onPress={() => pressHandler(wallet)} title='New Transaction' color='coral' />
 
-            {/*  <FlatList
+                </View>
+
+                {/*  <FlatList
                 data={reviews}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => navigation.navigate('ReviewDetails', item)}>
@@ -123,8 +131,8 @@ export default function Home({ navigation }) {
                     </TouchableOpacity>
                 )}
             /> */}
-        </View>
-    )
+            </View>
+        </View>)
 }
 
 
@@ -136,6 +144,14 @@ const styles = StyleSheet.create({
     }, container: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    list: {
+        flex: 0.4,
+        marginTop: 10,
+        marginBottom: 10,
+        padding: 6,
+        height: 300
+
     },
 
 });
