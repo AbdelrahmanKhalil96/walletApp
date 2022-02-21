@@ -10,19 +10,32 @@ export default function newTx({ navigation }) {
     const [TxAmount, setTxAmount] = useState(0);
     const [TxType, setTxType] = useState('-');
     const [TxImportance, setTxImportance] = useState('Low');
-    var dbFile = SQLite.openDatabase('WalletAppDb.db');
+    console.log('open')
     const InsertToDb = () => {
-        dbFile.transaction((tx) => {
-            tx.executeSql(
-                "INSERT INTO transactions (walletId, type, txAmount, txReason, txImportance) VALUES ( cast(? as integer), ?,  cast(? as integer), ?, ?);"
-                , [selectedWallet, TxType, TxAmount, txReason, TxImportance], (tx, res) => {
-                    navigation.navigate('Home',
-                        { counter: res["insertId"] })
+        try {
+            console.log('before')
+            var dbFile = SQLite.openDatabase('WalletAppDb.db');
 
-                }, (tx, err) => console.log(err)
+            dbFile.transaction((tx) => {
+                tx.executeSql(
+                    "INSERT INTO transactions (walletId, type, txAmount, txReason, txImportance) VALUES ( cast(? as integer), ?,  cast(? as integer), ?, ?);"
+                    , [selectedWallet, TxType, TxAmount, txReason, TxImportance], (tx, res) => {
+                        navigation.navigate('Home',
+                            { counter: res["insertId"] })
+                    }, (tx, err) => {
+                        console.log('tx');
+                        console.log(tx)
+                        console.log(err)
+                    }
 
-            );
-        })
+                );
+            })
+        } catch {
+            console.log('error')
+        } finally {
+            console.log('done')
+        }
+
     }
     return (
         <View style={styles.container}>

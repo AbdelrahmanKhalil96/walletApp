@@ -1,0 +1,36 @@
+CREATE TABLE IF NOT EXISTS 'transactions' (
+	'tid'	INTEGER,
+	'walletId'	INTEGER,
+	'type'	TEXT,
+	'txAmount'	REAL,
+	'txReason'	TEXT,
+	'txImportance'	TEXT,
+	'txDate'	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY('tid' AUTOINCREMENT),
+	FOREIGN KEY('walletId') REFERENCES 'wallets'('id')
+);
+
+CREATE TABLE IF NOT EXISTS 'transactions' ('tid' INTEGER,'walletId' INTEGER,'type' TEXT,'txAmount' REAL, 'txReason' TEXT, 'txImportance' TEXT, 'txDate'	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY('tid' AUTOINCREMENT), FOREIGN KEY('walletId') REFERENCES 'wallets'('id'));'
+CREATE TABLE IF NOT EXISTS 'wallets' (
+	'id'	INTEGER,
+	'name'	TEXT,
+	'balance'	REAL,
+	PRIMARY KEY('id' AUTOINCREMENT)
+);
+CREATE TRIGGER IF NOT EXISTS txUpdate
+AFTER INSERT ON transactions
+BEGIN
+UPDATE wallets SET balance=(SELECT CASE WHEN transactions.type='+'
+ THEN( wallets.balance + transactions.txAmount) 
+ ELSE (wallets.balance -transactions.txAmount) END
+ FROM wallets,transactions  WHERE wallets.id=(SELECT transactions.walletId as wId FROM transactions ORDER by tid desc LIMIT 1 )ORDER by tid desc LIMIT 1) 
+ WHERE wallets.id= (SELECT transactions.walletId FROM transactions ORDER by tid desc LIMIT 1);
+END
+
+
+INSERT INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('1', 'cibwallet', '315.5');
+INSERT INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('2', 'HouseWallet', '900.0');
+INSERT INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('3', 'pocketWallet', '20.0');
+INSERT INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('4', 'VFWallet', '40.0');
+INSERT INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('5', 'ahlyWallet', '100.0');
+INSERT INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('6', 'nourVFWallet', '0.0');

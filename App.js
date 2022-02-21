@@ -1,37 +1,36 @@
-import { StyleSheet, Text, Button, View, FlatList, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import * as SQLite from 'expo-sqlite';
-import * as FileSystem from 'expo-file-system';
-import { Asset } from 'expo-asset';
+import { StyleSheet, View, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React from 'react';
 import Header from './components/header';
-import Home from './screens/home';
-import AddTodo from './components/addTodo';
-import Sandbox from './components/sandbox';
 import Navigator from './routes/homeStack';
+/*
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://9b152bcc933440228b10f90ab8f4549c@o1143498.ingest.sentry.io/6204136',
+  enableInExpoDevelopment: true,
+  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+  enableNative: false
+});*/
 export default function App() {
 
-  const pressHandler = (key) => {
-    setWallets((prevwallet) => {
-      return prevwallet.filter(todo => todo.key != key);
-    })
-  }
-  const submitHandler = (text) => {
-    if (text.length > 3) {
-      setWallets((prevwallet) => {
-        return [
-
-          { text: text, key: Math.random().toString() }, ...prevwallet
-
-        ]
-      });
+  /*
+    const submitHandler = (text) => {
+      if (text.length > 3) {
+        setWallets((prevwallet) => {
+          return [
+  
+            { text: text, key: Math.random().toString() }, ...prevwallet
+  
+          ]
+        });
+      }
+      else {
+        Alert.alert('OOPS!', 'wallet Must Be Over 3 Chars Long', [{ text: 'understood', onPress: () => console.log('alert closed') }])
+      }
+  
     }
-    else {
-      Alert.alert('OOPS!', 'wallet Must Be Over 3 Chars Long', [{ text: 'understood', onPress: () => console.log('alert closed') }])
-    }
-
-  }
-
-
+  
+  */
   return (
     //  <Sandbox />
     <TouchableWithoutFeedback onPress={() => {
@@ -54,3 +53,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
+

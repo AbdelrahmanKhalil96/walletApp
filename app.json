@@ -9,7 +9,8 @@
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
-    },
+    }
+       ,
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -20,13 +21,47 @@
       "supportsTablet": true
     },
     "android": {
+      "permissions":["CAMERA","STORAGE","MEDIA_LIBRARY","MEDIA"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "body.walletApp"
+      ,
+    "build": {
+        "preview": {
+          "android": {
+            "buildType": "apk"
+          }
+        },
+        "preview2": {
+          "android": {
+            "gradleCommand": ":app:assembleRelease"
+          }
+        },
+        "preview3": {
+          "developmentClient": true
+        },
+        "production": {}
+      } 
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "abdelrahmankhalil96",
+            "project": "abdelrahmankhalil96",
+            "authToken": "e992b349eb0f4711a45cbabac05cae058696ae22a3b24816b1941369dff5d377"
+          }
+        }
+      ]
+    },
+    "plugins": [
+      "sentry-expo"
+    ]
   }
 }

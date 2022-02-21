@@ -29,7 +29,7 @@ export default function WalletList({ item, loadAllwallets }) {
     return (
         <TouchableOpacity onPress={() => loadAllwallets()}>
             <View style={[styles.item, { backgroundColor: getColor(item.key) }]}>
-                <Text style={styles.itemText} >{item.text}{'\n'}</Text>
+                <Text style={styles.itemText} >{item.text}</Text>
                 <Text style={styles.itemText} >{item.balance}</Text>
             </View>
 
@@ -38,9 +38,9 @@ export default function WalletList({ item, loadAllwallets }) {
 }
 const styles = StyleSheet.create({
     item: {
-        width: 110,
-        padding: 6,
-        margin: 8,
+        width: 105,
+        padding: 3,
+        margin: 5,
         borderColor: '#bbb',
         borderWidth: 1,
         borderRadius: 10,
