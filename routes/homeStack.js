@@ -3,6 +3,7 @@ import { createAppContainer } from 'react-navigation';
 import Home from "../screens/home";
 import newTx from '../screens/newTx';
 import Settings from '../screens/settings';
+import Todos from '../screens/todos';
 import React from 'react';
 
 
@@ -24,6 +25,9 @@ const screens = {
     },
     Settings: {
         screen: Settings
+    },
+    Todos: {
+        screen: Todos
     }
 
 }

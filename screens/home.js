@@ -46,6 +46,39 @@ export default function Home({ navigation }) {
             ]
         );
     };
+    const editfromDB = async (wallet, balance) => {
+        if (wallet != null && balance != null) {
+            console.log('wal' + wallet + 'b ' + balance)
+            try {
+                var db = SQLite.openDatabase('WalletAppDb.db');
+                console.log('opened')
+                db.transaction((tx) => {
+                    tx.executeSql(
+                        "UPDATE wallets SET balance= cast(? as FLOAT)  where id= cast(? as integer);",
+                        [balance, wallet],
+                        (tx, results) => {
+                            console.log(results)
+                        }
+                    );
+                    tx.executeSql(
+                        "select id,name,balance FROM wallets",
+                        [],
+                        (tx, results) => {
+                            var temp = [];
+                            for (let i = 0; i < results.rows.length; ++i) {
+                                temp.push({ text: results.rows.item(i).name, balance: results.rows.item(i).balance, key: results.rows.item(i).id });
+                            }
+                            setWallets(temp);
+                            setDb(db);
+                        }
+                    );
+                })
+            }
+            catch {
+                alert('db is close')
+            }
+        }
+    }
     const initEmptyDB = async () => {
         const { uri } = await FileSystem.getInfoAsync(
             `${FileSystem.documentDirectory}SQLite/${"WalletAppDb.db"}`
@@ -309,6 +342,23 @@ export default function Home({ navigation }) {
         }
         //navigation.push('TransactionDetails');
     }
+
+
+    const goToTodoList = () => {
+        navigation.navigate('Todos', {
+            wallet: wallet,
+            db: db,
+            //   loadala: {(props) => <UserProfile axiosUrl={axiosUrl}  {...props}} 
+        });
+        try {
+            db._db.close();
+        }
+        catch {
+            console.log('already closed')
+
+        }
+        //navigation.push('TransactionDetails');
+    }
     return (
         <View style={styles.container}>
             <View style={styles.list}>
@@ -323,7 +373,7 @@ export default function Home({ navigation }) {
                     numColumns={3}
                     data={wallet}
                     renderItem={({ item }) => (
-                        <WalletList item={item} loadAllwallets={loadAllwallets} />
+                        <WalletList item={item} loadAllwallets={loadAllwallets} editfromDB={editfromDB} />
                     )}
                 />
             </View>
@@ -332,13 +382,13 @@ export default function Home({ navigation }) {
             <View style={styles.buttons}>
                 <Button onPress={() => pressHandler(wallet)} title='New Tx' color='coral' />
                 <View style={styles.sep}></View>
-                <Button onPress={() => pressHandler(wallet)} title='Transfer' color='#A0E7E5' />
+                <Button onPress={() => goToTodoList()} title='Todos' color='#A0E7E5' />
                 <View style={styles.sep}></View>
 
-                <Button onPress={() => goToSettings()} title='Settings' color='#FFAEBC' />
+                <Button onPress={() => goToSettings()} title='Settings' color='#676FA3' />
                 <View style={styles.sep}></View>
 
-                <Button onPress={() => showConfirmDialog()} title='EmptyDB' color='#FFBED8' />
+                <Button onPress={() => showConfirmDialog()} title='EmptyDB' color='#B33030' />
                 <View style={styles.sep}></View>
 
             </View>

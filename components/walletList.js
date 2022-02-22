@@ -1,8 +1,24 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, Keyboard } from 'react-native';
+import React, { useState } from 'react';
+import Dialog from "react-native-dialog";
 
 
-export default function WalletList({ item, loadAllwallets }) {
+export default function WalletList({ item, loadAllwallets, editfromDB }) {
+    const [visible, setVisible] = useState(false);
+    const [text, setText] = useState('');
+    const showDialog = () => {
+        setVisible(true);
+    };
+
+    const handleCancel = () => {
+        setVisible(false);
+    };
+
+    const handleDelete = () => {
+        // The user has pressed the "Delete" button, so here you can do your own logic.
+        // ...Your logic
+        setVisible(false);
+    };
 
     const getColor = (key) => {
         switch (key) {
@@ -26,14 +42,34 @@ export default function WalletList({ item, loadAllwallets }) {
             }
         }
     }
-    return (
-        <TouchableOpacity onPress={() => loadAllwallets()}>
-            <View style={[styles.item, { backgroundColor: getColor(item.key) }]}>
-                <Text style={styles.itemText} >{item.text}</Text>
-                <Text style={styles.itemText} >{item.balance}</Text>
-            </View>
+    const editBalance = (wallet) => {
+        console.log(text + '' + wallet);
+        editfromDB(wallet, text)
+        setVisible(false);
 
-        </TouchableOpacity>
+    }
+
+    return (
+        <View>
+            <Dialog.Container visible={visible} style={{ color: '#000' }}>
+                <Dialog.Title>Adjust Balance</Dialog.Title>
+                <Dialog.Description>
+                    Do you want to Edit this Wallet? You cannot undo this action.
+        </Dialog.Description>
+                <Dialog.Input defaultValue={item.balance.toString()} onChangeText={newText => setText(newText)} />
+                <Dialog.Button label="Cancel" onPress={handleCancel} />
+                <Dialog.Button label="Edit Balance" onPress={() => editBalance(item.key)} />
+            </Dialog.Container>
+
+            <TouchableOpacity onPress={() => loadAllwallets()} onLongPress={() => showDialog()}        >
+                <View style={[styles.item, { backgroundColor: getColor(item.key) }]}>
+                    <Text style={styles.itemText} >{item.text}</Text>
+                    <Text style={styles.itemText} >{item.balance}</Text>
+                </View>
+
+            </TouchableOpacity>
+        </View>
+
     )
 }
 const styles = StyleSheet.create({
