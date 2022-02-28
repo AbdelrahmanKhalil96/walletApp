@@ -1,9 +1,11 @@
-import { Button, StyleSheet, View, FlatList, ScrollView, Text, Alert } from 'react-native';
+import { Button, StyleSheet, View, FlatList, Text, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import WalletList from '../components/walletList';
 import * as SQLite from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
 import { Asset } from 'expo-asset';
+import { ScrollView } from 'react-native-gesture-handler';
+
 import { Table, Row, Rows } from 'react-native-table-component';
 
 export default function Home({ navigation }) {
@@ -24,7 +26,6 @@ export default function Home({ navigation }) {
                     onPress: () => {
                         setShowBox(false);
                         try {
-                            setDb(SQLite.openDatabase('WalletAppDb.db'));
                             initEmptyDB();
 
                         }
@@ -61,12 +62,12 @@ export default function Home({ navigation }) {
                         }
                     );
                     tx.executeSql(
-                        "select id,name,balance FROM wallets",
+                        "select id,name,balance as balance FROM wallets",
                         [],
                         (tx, results) => {
                             var temp = [];
                             for (let i = 0; i < results.rows.length; ++i) {
-                                temp.push({ text: results.rows.item(i).name, balance: results.rows.item(i).balance, key: results.rows.item(i).id });
+                                temp.push({ text: results.rows.item(i).name, balance: cutNumber(results.rows.item(i).balance), key: results.rows.item(i).id });
                             }
                             setWallets(temp);
                             setDb(db);
@@ -103,7 +104,35 @@ export default function Home({ navigation }) {
             createDB();
         }
     }
+
+
+    /*
+        useEffect(() => {
+            const backAction = () => {
+                Alert.alert("Hold on!", "Are you sure you want to Exit ?", [
+                    {
+                        text: "Cancel",
+                        onPress: () => null,
+                        style: "cancel"
+                    },
+                    { text: "YES", onPress: () => BackHandler.exitApp() }
+                ]);
+                return true;
+            };
+    
+            const backHandler = BackHandler.addEventListener(
+                "hardwareBackPress",
+                backAction
+            );
+    
+            return () => backHandler.remove();
+        }, []);
+    
+    */
+
     const createDB = async () => {
+        var db = SQLite.openDatabase('WalletAppDb.db')
+        setDb(db);
         db.transaction((tx) => {
             tx.executeSql(
                 "CREATE TABLE IF NOT EXISTS 'wallets' ('id'	INTEGER, 'name'	TEXT, 'balance' REAL, PRIMARY KEY('id' AUTOINCREMENT));",
@@ -120,38 +149,45 @@ export default function Home({ navigation }) {
                 }
             );
             tx.executeSql(
-                "CREATE TRIGGER IF NOT EXISTS txUpdate AFTER INSERT ON transactions BEGIN UPDATE wallets SET balance=(SELECT CASE WHEN transactions.type='+' THEN( wallets.balance + transactions.txAmount) ELSE (wallets.balance -transactions.txAmount) END FROM wallets,transactions  WHERE wallets.id=(SELECT transactions.walletId as wId FROM transactions ORDER by tid desc LIMIT 1 )ORDER by tid desc LIMIT 1) WHERE wallets.id= (SELECT transactions.walletId FROM transactions ORDER by tid desc LIMIT 1); END",
+                "CREATE TABLE IF NOT EXISTS 'TodoList' ( 'id' INTEGER, 'todoItem' TEXT, 'Type' TEXT, 'TxId' INTEGER, 'Price' REAL, 'State' TEXT, 'Importance' INTEGER, PRIMARY KEY('id' AUTOINCREMENT), FOREIGN KEY('TxId') REFERENCES 'transactions'('tid'));",
                 [],
                 (tx, results) => {
                     Seterrr('3:')
                 }
             );
             tx.executeSql(
-                "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('1', 'cibWallet', '0');",
+                "CREATE TRIGGER IF NOT EXISTS txUpdate AFTER INSERT ON transactions BEGIN UPDATE wallets SET balance=(SELECT CASE WHEN transactions.type='+' THEN( wallets.balance + transactions.txAmount) ELSE (wallets.balance -transactions.txAmount) END FROM wallets,transactions  WHERE wallets.id=(SELECT transactions.walletId as wId FROM transactions ORDER by tid desc LIMIT 1 )ORDER by tid desc LIMIT 1) WHERE wallets.id= (SELECT transactions.walletId FROM transactions ORDER by tid desc LIMIT 1); END",
                 [],
                 (tx, results) => {
                     Seterrr('4:')
                 }
             );
             tx.executeSql(
-                "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('2', 'HomeWallet', '0.0');",
+                "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('1', 'cibWallet', '0');",
                 [],
                 (tx, results) => {
                     Seterrr('5:')
                 }
             );
             tx.executeSql(
-                "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('3', 'pocketWallet', '0.0');",
+                "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('2', 'HomeWallet', '0.0');",
                 [],
                 (tx, results) => {
                     Seterrr('6:')
                 }
             );
             tx.executeSql(
-                "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('4', 'VFWallet', '0.0');",
+                "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('3', 'pocketWallet', '0.0');",
                 [],
                 (tx, results) => {
                     Seterrr('7:')
+                }
+            );
+            tx.executeSql(
+                "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('4', 'VFWallet', '0.0');",
+                [],
+                (tx, results) => {
+                    Seterrr('8:')
                 }
             );
 
@@ -159,23 +195,23 @@ export default function Home({ navigation }) {
                 "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('5', 'ahlyWallet', '0.0');",
                 [],
                 (tx, results) => {
-                    Seterrr('8:')
+                    Seterrr('9:')
                 }
             );
             tx.executeSql(
                 "INSERT OR IGNORE INTO 'main'.'wallets' ('id', 'name', 'balance') VALUES ('6', 'nourVF', '0.0');",
                 [],
                 (tx, results) => {
-                    Seterrr('9:')
+                    Seterrr('10:')
                 }
             );
             tx.executeSql(
-                "select id,name,balance FROM wallets",
+                "select id,name,balance as balance FROM wallets",
                 [],
                 (tx, results) => {
                     var temp = [];
                     for (let i = 0; i < results.rows.length; ++i) {
-                        temp.push({ text: results.rows.item(i).name, balance: results.rows.item(i).balance, key: results.rows.item(i).id });
+                        temp.push({ text: results.rows.item(i).name, balance: cutNumber(results.rows.item(i).balance), key: results.rows.item(i).id });
                     }
                     setWallets(temp);
                     Seterrr('count=' + count)
@@ -183,7 +219,7 @@ export default function Home({ navigation }) {
                 }
             );
             tx.executeSql(
-                "SELECT tid,wallets.name, type, txAmount, txReason, txImportance, txDate FROM transactions,wallets WHERE transactions.walletId = wallets.id",
+                "SELECT tid,wallets.name, type, txAmount, txReason, txImportance, txDate FROM transactions,wallets WHERE transactions.walletId = wallets.id ORDER by txDate DESC",
                 [],
                 (tx, results) => {
                     var tempTrans = [];
@@ -213,6 +249,8 @@ export default function Home({ navigation }) {
 
     }
 
+
+
     const [wallet, setWallets] = useState([]);
     useEffect(() => {
         db = SQLite.openDatabase('WalletAppDb.db');
@@ -234,6 +272,11 @@ export default function Home({ navigation }) {
           return SQLite.openDatabase('WalletAppDb.db');
       }
   */
+    const cutNumber = (number) => {
+        const str = `${number}`;
+
+        return str.slice(0, str.indexOf('.') + 3);
+    }
     useEffect(() => {
         //alert('app started');
         searchForDb()/*.then(() => {
@@ -270,12 +313,12 @@ export default function Home({ navigation }) {
                 db = SQLite.openDatabase('WalletAppDb.db');
                 db.transaction((tx) => {
                     tx.executeSql(
-                        "select id,name,balance FROM wallets",
+                        "select id,name,balance as balance FROM wallets",
                         [],
                         (tx, results) => {
                             var temp = [];
                             for (let i = 0; i < results.rows.length; ++i) {
-                                temp.push({ text: results.rows.item(i).name, balance: results.rows.item(i).balance, key: results.rows.item(i).id });
+                                temp.push({ text: results.rows.item(i).name, balance: cutNumber(results.rows.item(i).balance), key: results.rows.item(i).id });
                             }
                             setWallets(temp);
                             setDb(db);
@@ -284,7 +327,7 @@ export default function Home({ navigation }) {
                         }
                     );
                     tx.executeSql(
-                        "SELECT tid,wallets.name, type, txAmount, txReason, txImportance, txDate FROM transactions,wallets WHERE transactions.walletId = wallets.id",
+                        "SELECT tid,wallets.name, type, txAmount, txReason, txImportance, txDate FROM transactions,wallets WHERE transactions.walletId = wallets.id ORDER by txDate DESC",
                         [],
                         (tx, results) => {
                             var tempTrans = [];
@@ -348,6 +391,7 @@ export default function Home({ navigation }) {
         navigation.navigate('Todos', {
             wallet: wallet,
             db: db,
+            tCount: Math.floor(Math.random() * 200),
             //   loadala: {(props) => <UserProfile axiosUrl={axiosUrl}  {...props}} 
         });
         try {
@@ -392,8 +436,8 @@ export default function Home({ navigation }) {
                 <View style={styles.sep}></View>
 
             </View>
-            <View style={styles.tableView}>
-                <ScrollView>
+            <View style={styles.tableView} onStartShouldSetResponder={() => true}>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <Table borderStyle={{ borderWidth: 1, borderColor: '#ffa1d2' }}>
                         <Row data={HeadTable} style={styles.HeadStyle} textStyle={styles.TableText} />
                         <Rows data={transactions} textStyle={styles.TableText} />
@@ -429,7 +473,7 @@ const styles = StyleSheet.create({
 
     },
     tableView: {
-        flex: 1,
+        flex: 1.3,
         marginTop: 10,
         marginBottom: 10,
         padding: 6,
@@ -456,4 +500,6 @@ const styles = StyleSheet.create({
 
         marginBottom: 10,
     },
+    dataWrapper: { marginTop: -1 },
+
 });

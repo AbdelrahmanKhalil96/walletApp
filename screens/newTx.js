@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, BackHandler } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
 
 export default function newTx({ navigation }) {
@@ -10,8 +10,8 @@ export default function newTx({ navigation }) {
 
     var [filteredWallets, setFilteredWallets] = useState(null);
 
-    var [selectedFromWallet, setSelectedFromWallet] = useState(0);
-    var [selectedToWallet, setSelectedToWallet] = useState(0);
+    var [selectedFromWallet, setSelectedFromWallet] = useState(1);
+    var [selectedToWallet, setSelectedToWallet] = useState(2);
     const [TfAmount, setTfAmount] = useState(0);
 
 
@@ -19,7 +19,29 @@ export default function newTx({ navigation }) {
     const [TxAmount, setTxAmount] = useState(0);
     const [TxType, setTxType] = useState('-');
     const [TxImportance, setTxImportance] = useState('Low');
-    console.log('open')
+
+
+    useEffect(() => {
+        const backAction = () => {
+            navigation.navigate('Home',
+                {
+                    counter: Math.floor(Math.random() * 200)
+                })
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
+
+
+    useEffect(() => {
+        filterWallets(1)
+    }, []);
 
     const filterWallets = (key) => {
         setFilteredWallets(wallet);
@@ -39,7 +61,7 @@ export default function newTx({ navigation }) {
                 tx.executeSql(
                     "UPDATE wallets SET balance=balance-cast(? as FLOAT)  where id=cast(? as integer);"
                     , [TfAmount, selectedFromWallet], (tx, res) => {
-                        console.log(res)
+                        // console.log(res)
                     }, (tx, err) => {
                         console.log(err)
                     }
@@ -49,7 +71,7 @@ export default function newTx({ navigation }) {
                 tx.executeSql(
                     "UPDATE wallets SET balance=balance+cast(? as FLOAT)  where  id=cast(? as integer);"
                     , [TfAmount, selectedToWallet], (tx, res) => {
-                        console.log(res)
+                        //console.log(res)
                         alert('Transferred Successfully ')
                         navigation.navigate('Home',
                             {
@@ -77,7 +99,7 @@ export default function newTx({ navigation }) {
 
             dbFile.transaction((tx) => {
                 tx.executeSql(
-                    "INSERT INTO transactions (walletId, type, txAmount, txReason, txImportance) VALUES ( cast(? as integer), ?,  cast(? as integer), ?, ?);"
+                    "INSERT INTO transactions (walletId, type, txAmount, txReason, txImportance) VALUES ( cast(? as integer), ?,  cast(? as FLOAT), ?, ?);"
                     , [selectedWallet, TxType, TxAmount, txReason, TxImportance], (tx, res) => {
                         navigation.navigate('Home',
                             { counter: res["insertId"] })
@@ -179,6 +201,15 @@ export default function newTx({ navigation }) {
                             value='+'
                         />
                     </Picker>
+                    {/**Reason */}
+                    <Text>Reason</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Transaction Reason'
+                        onChangeText={setTxReason}
+                        value={txReason}
+
+                    />
                     {/**Importance */}
                     <Text>Transaction Importance : </Text>
                     <Picker
@@ -207,15 +238,7 @@ export default function newTx({ navigation }) {
                             value='High'
                         />
                     </Picker>
-                    {/**Reason */}
 
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Transaction Reason'
-                        onChangeText={setTxReason}
-                        value={txReason}
-
-                    />
                     <Button title='Proceed' onPress={() => InsertToDb()} />
 
                 </View>
@@ -237,12 +260,7 @@ export default function newTx({ navigation }) {
                         }
                         }
                     >
-                        <Picker.Item
-                            label={'Please Select'}
-                            key={0}
-                            value={'disabled'}
-                            enabled={false}
-                        />
+
                         {wallet.map((item) => (
                             <Picker.Item
                                 color="#0087F0"
@@ -259,6 +277,7 @@ export default function newTx({ navigation }) {
                         <Picker
                             itemStyle={styles.itemStyle}
                             style={styles.pickerStyle}
+                            /* mode={"dropdown"} */
                             selectedValue={selectedToWallet}
                             onValueChange={(itemValue, itemIndex) => {
                                 setSelectedToWallet(itemValue);
@@ -266,12 +285,12 @@ export default function newTx({ navigation }) {
                             }
                             }
                         >
-                            <Picker.Item
+                            {/*  <Picker.Item
                                 label={'Please Select'}
                                 key={0}
                                 value={0}
                                 enabled={false}
-                            />
+                            /> */}
                             {filteredWallets.map((item) => (
                                 <Picker.Item
                                     color="#0087F0"
@@ -295,6 +314,10 @@ export default function newTx({ navigation }) {
 
 
                     <Button title='Transfer' onPress={() => {
+
+                        console.log(filteredWallets)
+
+                        console.log(selectedToWallet)
                         if (filteredWallets != null && selectedToWallet != 0) { transferDB() }
                         else {
                             alert('Please Select First')
@@ -324,7 +347,7 @@ const styles = StyleSheet.create({
         color: "#007aff"
     },
     pickerStyle: {
-        width: "80%",
+        width: "60%",
         height: 40,
         color: "#007aff",
         fontSize: 12,

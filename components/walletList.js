@@ -14,12 +14,6 @@ export default function WalletList({ item, loadAllwallets, editfromDB }) {
         setVisible(false);
     };
 
-    const handleDelete = () => {
-        // The user has pressed the "Delete" button, so here you can do your own logic.
-        // ...Your logic
-        setVisible(false);
-    };
-
     const getColor = (key) => {
         switch (key) {
             case 1: {
@@ -51,12 +45,12 @@ export default function WalletList({ item, loadAllwallets, editfromDB }) {
 
     return (
         <View>
-            <Dialog.Container visible={visible} style={{ color: '#000' }}>
+            <Dialog.Container visible={visible} style={{ color: '#000', flex: 1 }}>
                 <Dialog.Title>Adjust Balance</Dialog.Title>
                 <Dialog.Description>
                     Do you want to Edit this Wallet? You cannot undo this action.
         </Dialog.Description>
-                <Dialog.Input defaultValue={item.balance.toString()} onChangeText={newText => setText(newText)} />
+                <Dialog.Input keyboardType='numeric' defaultValue={item.balance.toString()} onChangeText={newText => setText(newText)} />
                 <Dialog.Button label="Cancel" onPress={handleCancel} />
                 <Dialog.Button label="Edit Balance" onPress={() => editBalance(item.key)} />
             </Dialog.Container>

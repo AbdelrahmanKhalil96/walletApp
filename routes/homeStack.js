@@ -1,4 +1,4 @@
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator, HeaderBackButton } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
 import Home from "../screens/home";
 import newTx from '../screens/newTx';
@@ -16,18 +16,26 @@ const screens = {
 
     },
     TransactionDetails: {
-        screen: newTx
-
+        screen: newTx,
+        navigationOptions: {
+            headerLeft: () => false
+        }
         /*   navigationOptions: {
                headerStyle: { backgroundColor: '#eee' },
            }*/
 
     },
     Settings: {
-        screen: Settings
+        screen: Settings,
+        navigationOptions: {
+            headerLeft: () => false
+        }
     },
     Todos: {
-        screen: Todos
+        screen: Todos,
+        navigationOptions: {
+            headerLeft: () => false
+        }
     }
 
 }

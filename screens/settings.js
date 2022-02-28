@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, BackHandler } from 'react-native';
 import React from 'react';
 import * as SQLite from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
@@ -32,6 +32,25 @@ export default function Settings({ navigation }) {
         }
 
     }
+    /*
+    useEffect(() => {
+        const backAction = () => {
+            navigation.navigate('Home',
+                {
+                    counter: Math.floor(Math.random() * 200)
+                })
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
+*/
+
     const newDb = async () => {
         /*   const { uri } = await FileSystem.getInfoAsync(
                `${FileSystem.documentDirectory}SQLite/${"WalletAppDb.db"}`
@@ -80,7 +99,7 @@ export default function Settings({ navigation }) {
             const asset = await MediaLibrary.createAssetAsync(downloadedFile);
             MediaLibrary.createAlbumAsync("Download", asset)
                 .then(() => {
-                    alert('Album created!');
+                    alert('Backup To DCIM Is Successful!');
                 })
                 .catch(error => {
                     console.log('err', error);
