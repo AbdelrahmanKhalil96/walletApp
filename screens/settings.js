@@ -61,7 +61,7 @@ export default function Settings({ navigation }) {
             type: '*/*',
             copyToCacheDirectory: false,
         });
-        console.log(result.type)
+        console.log('URI IS : ' + result.uri)
         if (result.type == 'success') {
             const { uri } = await FileSystem.getInfoAsync(
                 `${FileSystem.documentDirectory}SQLite/${'WalletAppDb.db'}`
@@ -77,6 +77,8 @@ export default function Settings({ navigation }) {
             await FileSystem.copyAsync({
                 from: result.uri,
                 to: `${FileSystem.documentDirectory}SQLite/`
+                ////  to: `${FileSystem.documentDirectory}SQLite/${"WalletAppDb.db"}`
+
             }).then(() => {
                 //     alert('file Imported Successfully');
                 navigation.navigate('Home',

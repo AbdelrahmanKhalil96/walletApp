@@ -9,8 +9,15 @@
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
-    }
-       ,
+    },
+    "build": {
+      "preview2": {
+        "ios": {
+          "simulator": true
+        }
+      },
+      "production": {}
+    },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -18,17 +25,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "body.walletApp"
     },
     "android": {
-      "permissions":["CAMERA","STORAGE","MEDIA_LIBRARY","MEDIA"],
+      "permissions": [
+        "CAMERA",
+        "STORAGE",
+        "MEDIA_LIBRARY",
+        "MEDIA"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "body.walletApp"
-      ,
-    "build": {
+      "package": "body.walletApp",
+      "softwareKeyboardLayoutMode": "pan",
+      "build": {
         "preview": {
           "android": {
             "buildType": "apk"
@@ -43,7 +56,7 @@
           "developmentClient": true
         },
         "production": {}
-      } 
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

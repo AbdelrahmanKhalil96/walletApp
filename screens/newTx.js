@@ -92,25 +92,35 @@ export default function newTx({ navigation }) {
 
 
     }
+    // String.prototype.isNumber = function () { return /^\d+$/.test(this); }
+
     const InsertToDb = () => {
         try {
+            //if (TxAmount.isNumber()) {
             console.log('before')
             var dbFile = SQLite.openDatabase('WalletAppDb.db');
 
             dbFile.transaction((tx) => {
                 tx.executeSql(
-                    "INSERT INTO transactions (walletId, type, txAmount, txReason, txImportance) VALUES ( cast(? as integer), ?,  cast(? as FLOAT), ?, ?);"
-                    , [selectedWallet, TxType, TxAmount, txReason, TxImportance], (tx, res) => {
+                    "INSERT INTO transactions (walletId, type, txAmount, txReason, txImportance, BalanceAfter) VALUES ( cast(? as integer), ?,  cast(? as FLOAT), ?, ?,cast(  ((SELECT balance FROM wallets WHERE id=?)" + TxType.replace(/['"]+/g, '') + "  ?) as FLOAT) );"
+                    , [selectedWallet, TxType, TxAmount, txReason, TxImportance, selectedWallet, TxAmount], (tx, res) => {
+                        console.log(res)
                         navigation.navigate('Home',
                             { counter: res["insertId"] })
                     }, (tx, err) => {
                         console.log('tx');
+                        console.log(TxType)
+
                         console.log(tx)
                         console.log(err)
                     }
 
                 );
             })
+
+
+
+
         } catch {
             console.log('error')
         } finally {
@@ -168,15 +178,27 @@ export default function newTx({ navigation }) {
                                 key={item.key} />
                         ))}
                     </Picker>
-                    {/**Amount */}
+                    <View style={styles.twoInputs}>
+                        {/**Amount */}
 
-                    <TextInput
-                        keyboardType='number-pad'
-                        style={styles.input}
-                        placeholder='Transaction Amount'
-                        onChangeText={setTxAmount}
-                        value={TxAmount.toString()}
-                    />
+                        <TextInput
+                            keyboardType='number-pad'
+                            style={styles.input}
+                            placeholder='Transaction Amount'
+                            onChangeText={setTxAmount}
+                            value={TxAmount.toString()}
+                        />
+                        {/**Reason */}
+                        <Text> Reason Is : </Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Transaction Reason'
+                            textAlign={'center'}
+                            onChangeText={setTxReason}
+                            value={txReason}
+
+                        />
+                    </View>
                     {/**Type */}
 
                     <Text>Transaction Type : </Text>
@@ -201,15 +223,7 @@ export default function newTx({ navigation }) {
                             value='+'
                         />
                     </Picker>
-                    {/**Reason */}
-                    <Text>Reason</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Transaction Reason'
-                        onChangeText={setTxReason}
-                        value={txReason}
 
-                    />
                     {/**Importance */}
                     <Text>Transaction Importance : </Text>
                     <Picker
@@ -239,11 +253,21 @@ export default function newTx({ navigation }) {
                         />
                     </Picker>
 
-                    <Button title='Proceed' onPress={() => InsertToDb()} />
+                    <Button title='Proceed' onPress={() => InsertToDb()} color='coral' />
 
                 </View>
                 :
                 <View>
+                    {/**Amount */}
+                    <Text>Transfer Amount : </Text>
+
+                    <TextInput
+                        keyboardType='number-pad'
+                        style={styles.input}
+                        placeholder='Transaction Amount'
+                        onChangeText={setTfAmount}
+                        value={TfAmount.toString()}
+                    />
 
 
                     {/**Source */}
@@ -302,18 +326,8 @@ export default function newTx({ navigation }) {
                         :
                         <Text>Please Select The First Wallet First</Text>
                     }
-                    {/**Amount */}
 
-                    <TextInput
-                        keyboardType='number-pad'
-                        style={styles.input}
-                        placeholder='Transaction Amount'
-                        onChangeText={setTfAmount}
-                        value={TfAmount.toString()}
-                    />
-
-
-                    <Button title='Transfer' onPress={() => {
+                    <Button title='Transfer' color='coral' onPress={() => {
 
                         console.log(filteredWallets)
 
@@ -358,9 +372,14 @@ const styles = StyleSheet.create({
     input: {
         marginBottom: 10,
         paddingHorizontal: 8,
-        paddingVertical: 6,
         borderBottomWidth: 2,
-        borderBottomColor: '#ddd'
+        borderBottomColor: '#ddd',
+        paddingTop: 0,
+        paddingBottom: 0
 
     },
+    twoInputs: {
+        flexDirection: 'row',
+
+    }
 });

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, BackHandler, FlatList, Alert } from 'react-native';
+import { StyleSheet, Text, View, Button, BackHandler, FlatList, Alert, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import TodoItem from '../components/todoitem';
 import * as SQLite from 'expo-sqlite';
@@ -12,7 +12,7 @@ export default function Todos({ navigation }) {
     const [solved, setSolved] = useState(false);
     const [showBox, setShowBox] = useState(true);
 
-
+    const [totals, settotals] = useState([]);
     const [todoItem, settodoItem] = useState('');
     const [todoType, settodoType] = useState('');
     const [todoPrice, settodoPrice] = useState(0);
@@ -96,6 +96,46 @@ export default function Todos({ navigation }) {
                         }
 
                     );
+                    tx.executeSql(
+                        "SELECT Importance, sum(Price) as total FROM TodoList WHERE State ='Pending' GROUP by Importance ORDER by Importance desc"
+                        , [], (tx, results) => {
+                            //console.log(results)
+                            var tempTotals = [];
+                            for (let i = 0; i < results.rows.length; ++i) {
+                                //   console.log(results.rows.item(i).total)
+                                tempTotals.push({
+                                    key: results.rows.item(i).Importance,
+                                    total: results.rows.item(i).total
+                                });
+
+                            }
+                            settotals(tempTotals);
+                            console.log(tempTotals)
+                        }, (tx, err) => {
+                            console.log(err)
+                        }
+
+                    );
+                    tx.executeSql(
+                        "SELECT Importance, sum(Price) as total FROM TodoList WHERE State ='Pending' GROUP by Importance ORDER by Importance desc"
+                        , [], (tx, results) => {
+                            //console.log(results)
+                            var tempTotals = [];
+                            for (let i = 0; i < results.rows.length; ++i) {
+                                //   console.log(results.rows.item(i).total)
+                                tempTotals.push({
+                                    key: results.rows.item(i).Importance,
+                                    total: results.rows.item(i).total
+                                });
+
+                            }
+                            settotals(tempTotals);
+                            console.log(tempTotals)
+                        }, (tx, err) => {
+                            console.log(err)
+                        }
+
+                    );
                 })
             } catch {
                 console.log('error')
@@ -142,6 +182,26 @@ export default function Todos({ navigation }) {
                             loadTodos()
                             setVisible(false);
 
+                        }, (tx, err) => {
+                            console.log(err)
+                        }
+
+                    );
+                    tx.executeSql(
+                        "SELECT Importance, sum(Price) as total FROM TodoList WHERE State ='Pending' GROUP by Importance ORDER by Importance desc"
+                        , [], (tx, results) => {
+                            //console.log(results)
+                            var tempTotals = [];
+                            for (let i = 0; i < results.rows.length; ++i) {
+                                //   console.log(results.rows.item(i).total)
+                                tempTotals.push({
+                                    key: results.rows.item(i).Importance,
+                                    total: results.rows.item(i).total
+                                });
+
+                            }
+                            settotals(tempTotals);
+                            console.log(tempTotals)
                         }, (tx, err) => {
                             console.log(err)
                         }
@@ -200,6 +260,26 @@ export default function Todos({ navigation }) {
                                         }
 
                                     );
+                                    tx.executeSql(
+                                        "SELECT Importance, sum(Price) as total FROM TodoList WHERE State ='Pending' GROUP by Importance ORDER by Importance desc"
+                                        , [], (tx, results) => {
+                                            //console.log(results)
+                                            var tempTotals = [];
+                                            for (let i = 0; i < results.rows.length; ++i) {
+                                                //   console.log(results.rows.item(i).total)
+                                                tempTotals.push({
+                                                    key: results.rows.item(i).Importance,
+                                                    total: results.rows.item(i).total
+                                                });
+
+                                            }
+                                            settotals(tempTotals);
+                                            console.log(tempTotals)
+                                        }, (tx, err) => {
+                                            console.log(err)
+                                        }
+
+                                    );
                                 })
 
                             }
@@ -250,6 +330,27 @@ export default function Todos({ navigation }) {
                             });
                         }
                         setTodos(tempTodos);
+                    }, (tx, err) => {
+                        console.log(err)
+                    }
+
+                );
+
+                tx.executeSql(
+                    "SELECT Importance, sum(Price) as total FROM TodoList WHERE State ='Pending' GROUP by Importance ORDER by Importance desc"
+                    , [], (tx, results) => {
+                        //console.log(results)
+                        var tempTotals = [];
+                        for (let i = 0; i < results.rows.length; ++i) {
+                            //   console.log(results.rows.item(i).total)
+                            tempTotals.push({
+                                key: results.rows.item(i).Importance,
+                                total: results.rows.item(i).total
+                            });
+
+                        }
+                        settotals(tempTotals);
+                        console.log(tempTotals)
                     }, (tx, err) => {
                         console.log(err)
                     }
@@ -434,11 +535,23 @@ export default function Todos({ navigation }) {
                 <Dialog.Button label="Edit Todo" onPress={() => applyEditTodo()} />
             </Dialog.Container>
 
-
             <View style={styles.content}>
                 <AddTodo showDialog={showDialog} />
 
+                <View onStartShouldSetResponder={() => true}>
+                    <Text>{"\n"}</Text>
+                    <FlatList
+                        horizontal
+                        data={totals}
+                        renderItem={({ item }) => (
+                            <View style={styles.item}>
+                                <Text style={styles.itemText} >Imp: {item.key} Total is : {item.total} </Text>
+                            </View>
+                        )}
+                    />
+                </View>
                 <View style={styles.list}>
+
                     <FlatList
                         data={todos}
                         renderItem={({ item }) => (
@@ -480,4 +593,14 @@ const styles = StyleSheet.create({
 
         marginBottom: 10,
     },
+    item: {
+
+        borderColor: '#00FFC6',
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderRadius: 10,
+        marginRight: 5,
+        textAlign: 'left'
+    },
+
 });

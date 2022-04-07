@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View, Keyboard } from 'react-native';
 import React, { useState } from 'react';
 import Dialog from "react-native-dialog";
+import { TextInput } from 'react-native-gesture-handler';
 
 
 export default function WalletList({ item, loadAllwallets, editfromDB }) {
@@ -47,10 +48,10 @@ export default function WalletList({ item, loadAllwallets, editfromDB }) {
         <View>
             <Dialog.Container visible={visible} style={{ color: '#000', flex: 1 }}>
                 <Dialog.Title>Adjust Balance</Dialog.Title>
-                <Dialog.Description>
-                    Do you want to Edit this Wallet? You cannot undo this action.
-        </Dialog.Description>
-                <Dialog.Input keyboardType='numeric' defaultValue={item.balance.toString()} onChangeText={newText => setText(newText)} />
+                <Text>
+                    Do you want to Edit this Wallet? You cannot undo this action. {"\n"}
+                </Text>
+                <TextInput keyboardType='numeric' defaultValue={item.balance.toString()} onChangeText={newText => setText(newText)} />
                 <Dialog.Button label="Cancel" onPress={handleCancel} />
                 <Dialog.Button label="Edit Balance" onPress={() => editBalance(item.key)} />
             </Dialog.Container>
